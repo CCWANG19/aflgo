@@ -119,12 +119,12 @@ bool AFLCoverage::runOnModule(Module &M) {
     std::ifstream targetsfile(TargetsFile);
     std::string line;
     while (std::getline(targetsfile, line))
-      targets.push_back(line);
+      targets.push_back(line);   //读取BBtargets.txt内容
     targetsfile.close();
 
     is_aflgo_preprocessing = true;
 
-  } else if (!DistanceFile.empty()) {
+  } else if (!DistanceFile.empty()) {   //DistanceFile为空，不进入
 
     std::ifstream cf (DistanceFile.c_str());
     if (cf.is_open()) {
@@ -233,7 +233,7 @@ bool AFLCoverage::runOnModule(Module &M) {
 
     /* Create dot-files directory */
     std::string dotfiles(OutDirectory + "/dot-files");
-    if (stat(dotfiles.c_str(), &sb) != 0) {
+    if (stat(dotfiles.c_str(), &sb) != 0) {  //获取文件信息，成功返回0，失败返回-1；第一个参数是文件名
       const int dir_err = mkdir(dotfiles.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
       if (-1 == dir_err)
         FATAL("Could not create directory %s.", dotfiles.c_str());
@@ -269,7 +269,7 @@ bool AFLCoverage::runOnModule(Module &M) {
         unsigned line;
 
         for (auto &I : BB) {
-#ifdef LLVM_OLD_DEBUG_API
+#ifdef LLVM_OLD_DEBUG_API  //主要得到line,filename
           DebugLoc Loc = I.getDebugLoc();
           if (!Loc.isUnknown()) {
 
@@ -327,7 +327,7 @@ bool AFLCoverage::runOnModule(Module &M) {
                 unsigned int target_line = atoi(target.substr(pos + 1).c_str());
 
                 if (!target_file.compare(filename) && target_line == line)
-                  is_target = true;
+                  is_target = true;  //找到了目标点
 
               }
             }
@@ -350,7 +350,7 @@ bool AFLCoverage::runOnModule(Module &M) {
                   }
                 }
                 if (!blacklisted)
-                  bbcalls << bb_name << "," << called << "\n";
+                  bbcalls << bb_name << "," << called << "\n";  //写入BBcalls.txt
               }
             }
           }
@@ -367,7 +367,7 @@ bool AFLCoverage::runOnModule(Module &M) {
             BB.setValueName(ValueName::Create(NameRef));
           }
 
-          bbnames << BB.getName().str() << "\n";
+          bbnames << BB.getName().str() << "\n";   //写入BBnames.txt
           has_BBs = true;
 
 #ifdef AFLGO_TRACING
@@ -381,7 +381,7 @@ bool AFLCoverage::runOnModule(Module &M) {
 #endif
 
         }
-      }
+      }  // end of for(auto &BB : F)
 
       if (has_BBs) {
         /* Print CFG */
@@ -402,14 +402,14 @@ bool AFLCoverage::runOnModule(Module &M) {
           ftargets << F.getName().str() << "\n";
         fnames << F.getName().str() << "\n";
       }
-    }
+    }  //end of for(auto &F :M)
 
     bbnames.close();
     bbcalls.close();
     fnames.close();
     ftargets.close();
 
-  } else {
+  } else {    //end of if(is_aflgo_preprocessing)
 
     for (auto &F : M) {
 
@@ -601,7 +601,7 @@ bool AFLCoverage::runOnModule(Module &M) {
 
   return true;
 
-}
+} //end runOnModule
 
 
 static void registerAFLPass(const PassManagerBuilder &,
